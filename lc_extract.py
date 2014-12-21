@@ -9,10 +9,6 @@ try:
   import numpy as np
 except:
   missing_mods.append("numpy")
-try:
-  import matplotlib.pyplot as plt
-except:
-  missing_mods.append("matplotlib")
 
 if missing_mods:
   sys.exit("\n***ERROR! You must have the following modules installed: %s\n" 
@@ -40,7 +36,7 @@ def get_info_table(filename, verbose=False):
          'S40','f8','f8','f8','f8',]
 
   try:
-    if verbose: print("Reading info table %s." % filename)
+    if verbose: print("\nReading info table %s." % filename)
     info_table = np.genfromtxt(filename, names=header, autostrip=True, dtype=fmt,
                                missing_values=("0.0","000"), filling_values=np.nan)
   except Exception as e:
@@ -281,21 +277,24 @@ def main():
   
   # Read info table
   info_table = get_info_table(args.info, verbose=args.verbose)
-  source_list = info_table["id"]
+  all_sources = info_table["id"]
 
   # Check to see if provided source is a filename
   if os.path.isfile(args.source[0]):
     print("List of sources provided.")
+    source_list = [x.strip("\n") for x in open(args.source[0], "r")]  
+  else: 
+    source_list = args.source
 
   # Read in the zeropoints table and put into ZeroPoints class
   raw_zp = get_zeropoints(args.zp, verbose=args.verbose)
   zps = ZeroPoints(raw_zp, args.dm)
 
   if args.source[0].lower() == "list":
-    for each in source_list: print(each)
+    for each in all_sources: print(each)
     exit()
 
-  for source in args.source:
+  for source in source_list:
     if args.verbose:
       print("\n***Getting light curve for %s***" % source)
 

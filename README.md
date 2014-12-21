@@ -11,7 +11,8 @@ Usage: extract light curves from multi-epoch imaging using the LBC. It is assume
 
 Installation:  
 1. Clone LBT_LBC repository by executing: `git clone https://github.com/skylergrammer/LBT_LBC.git`  
-2. Add repository to ~~$PYTHONPATH~~ in bash: `export PYTHONPATH=$PYTHONPATH:path_to_LBT_LBC_respository`  
+2. Add repository to $PYTHONPATH in bash: `export PYTHONPATH=$PYTHONPATH:path_to_LBT_LBC_respository`  
+3. Make lc_extract.py executable: `chmod u+x lc_extract.py`
 
 Required input:  
 

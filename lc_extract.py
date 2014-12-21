@@ -1,11 +1,25 @@
 #! /usr/bin/env python
+
+missing_mods = []
+
 import sys
 import os
-import numpy as np
 import argparse
-import matplotlib.pyplot as plt
+try:
+  import numpy as np
+except:
+  missing_mods.append("numpy")
+try:
+  import matplotlib.pyplot as plt
+except:
+  missing_mods.append("matplotlib")
 
-def get_info_table(filename):
+if missing_mods:
+  sys.exit("\n***ERROR! You must have the following modules installed: %s\n" 
+           % ', '.join(missing_mods))
+
+
+def get_info_table(filename, verbose=False):
   '''
   Reads the file that contains the reference information for each object 
   -- e.g. id, light curve filenames, reference mags, etc.
@@ -25,8 +39,13 @@ def get_info_table(filename):
          'S40','f8','f8','f8','f8',
          'S40','f8','f8','f8','f8',]
 
-  info_table = np.genfromtxt(filename, names=header, autostrip=True, dtype=fmt,
-                             missing_values=("0.0","000"), filling_values=np.nan)
+  try:
+    if verbose: print("Reading info table %s." % filename)
+    info_table = np.genfromtxt(filename, names=header, autostrip=True, dtype=fmt,
+                               missing_values=("0.0","000"), filling_values=np.nan)
+  except Exception as e:
+    if verbose: print(e)
+    sys.exit("***Error whiile reading %s.  Verify that the filename is correct." % filename) 
 
   return info_table
 
@@ -41,11 +60,11 @@ class ZeroPoints:
     self.eV = data["eV"]
     self.R = data["R"]
     self.eR = data["eR"]
-    self.dm = dm[0]
-    self.edm = dm[1]
+    self.dm = dm
+
     
     
-def get_zeropoints(filename):
+def get_zeropoints(filename, verbose=False):
   '''
   Reads the zero point info from the zero point file.
   '''
@@ -53,18 +72,24 @@ def get_zeropoints(filename):
   header = ["chip","U","eU","B","eB","V","eV","R","eR"]
   fmt = ['L', 'f8', 'f8', 'f8', 'f8', 'f8', 'f8', 'f8', 'f8']
  
-  zeropoints = np.genfromtxt(filename, names=header)
+  try:
+    if verbose: print("Reading zeropoints file: %s" % filename)
+    zeropoints = np.genfromtxt(filename, names=header)
+  except Exception as e:
+    if verbose: print(e)  
+    sys.exit("***Error! Cannot read %s, verify that it exists and has 9 columns." % filename)
 
   return zeropoints
 
 
-def get_lc_data(filename):
+def get_lc_data(filename, verbose=False):
   '''
   Reads in the actual light curve info from the light curve filename provided
   in the info table.
   '''
 
   header = ['mjd', 'dCounts', 'edCounts']
+  if verbose: print("Reading light curve file %s" % filename)
   lc_data = np.genfromtxt(filename, usecols=[0,1,2], names=header)
 
   return lc_data
@@ -82,7 +107,7 @@ class RefInfo:
     ref_info = [x for x in data if id in x]
 
     if not ref_info:
-      sys.exit("\n***ERROR: %s does not exist within the info table.\n" % id)
+      sys.exit("***ERROR: %s does not exist within the info table.\n" % id)
     else:
       ref_info = ref_info[0]
     
@@ -129,19 +154,19 @@ class RefInfo:
     '''
 
     if self.lcU: 
-      print(self.lcU)
+      print("U-Band lightcurve filename: %s" % self.lcU)
     else: 
       print("No U light curve")
     if self.lcB:
-      print(self.lcB)
+      print("B-Band lightcurve filename: %s" % self.lcB)
     else: 
       print("No B light curve")
     if self.lcV:
-      print(self.lcV)
+      print("V-Band lightcurve filename: %s" % self.lcV)
     else: 
       print("No V light curve")
     if self.lcR:
-      print(self.lcR)
+      print("R-Band lightcurve filename: %s" % self.lcR)
     else: 
       print("No R light curve")
 
@@ -183,7 +208,6 @@ def convert_to_lc(lc, src_ref_info, zps, band=None, chip=1):
   # Default offset is the zeropoint plus the IRAF 25.0
   offset = zp + 25.0
 
-  
   # Convert ref_mag to counts
   ref_counts = 10**((ref_mag-offset + zps.dm)/-2.5)
   
@@ -199,55 +223,90 @@ def convert_to_lc(lc, src_ref_info, zps, band=None, chip=1):
   emag_i = [np.sqrt(Beta + (1.1*y/x)**2 + ezp**2) 
             for x,y in zip(counts_i,lc['edCounts'])]  
   
-  # Output dictionary to hold light curve
-  output = {"mjd":lc["mjd"], "mag":mag_i, "emag":emag_i}
-  
+  # Output list to hold light curve
+  output = [x for x in zip(lc["mjd"], mag_i, emag_i)]
+
   return output
 
 
-def extract_light_curves(src_ref_info, zps, chip=None):
+def extract_light_curves(src_ref_info, zps, chip=None, verbose=False):
   '''
   Extracts the light curves for each band.  
   '''
 
   if src_ref_info.lcU:
-    lcU_data = get_lc_data(src_ref_info.lcU)
+    lcU_data = get_lc_data(src_ref_info.lcU, verbose=verbose)
     light_curve_U = convert_to_lc(lcU_data, src_ref_info, zps, band="U", chip=chip)
-  
+    write_to_file(light_curve_U, src_ref_info.id, band="U", verbose=verbose)
 
   if src_ref_info.lcB:
-    lcB_data = get_lc_data(src_ref_info.lcB)
+    lcB_data = get_lc_data(src_ref_info.lcB, verbose=verbose)
     light_curve_B = convert_to_lc(lcB_data, src_ref_info, zps, band="B", chip=chip)
+    write_to_file(light_curve_B, src_ref_info.id, band="B", verbose=verbose)
 
   if src_ref_info.lcV:
-    lcV_data = get_lc_data(src_ref_info.lcV)
+    lcV_data = get_lc_data(src_ref_info.lcV, verbose=verbose)
     light_curve_V = convert_to_lc(lcV_data, src_ref_info, zps, band="V", chip=chip)
+    write_to_file(light_curve_V, src_ref_info.id, band="V", verbose=verbose)
 
   if src_ref_info.lcR:
-    lcR_data = get_lc_data(src_ref_info.lcR)
+    lcR_data = get_lc_data(src_ref_info.lcR, verbose=verbose)
     light_curve_R = convert_to_lc(lcR_data, src_ref_info, zps, band="R", chip=chip)
+    write_to_file(light_curve_R, src_ref_info.id, band="R", verbose=verbose)
 
+def write_to_file(light_curve, sourceid, band, verbose=False):
+
+
+  filename = "_".join(["lc",sourceid, band+".txt"])
+
+  if verbose: print("Writing light curve to %s" % filename)
+
+  with open(filename, "w") as f:
+    f.write("   ".join(["# mjd", band, "error"])+"\n")
+    for line in light_curve:
+      pretty_line = "   ".join(["%0.4f" % x for x in line])
+      f.write(pretty_line+"\n")
+    
 
 def main():
   
   parser = argparse.ArgumentParser()
-  parser.add_argument("--info", required=True)
-  parser.add_argument("--source", required=True)
-  parser.add_argument("--zp", required=True)
-  parser.add_argument("--dm", nargs=2, type=float, required=True)
-  parser.add_argument("--chip", type=int, required=True)
+  parser.add_argument("--info", required=True, help="Filename containing reference magnitudes, coordinates, ids, and filenames for the light curves.")
+  parser.add_argument("--source", nargs="+", help="Source(s) to extract or filename containing list of sources.  Give the string 'list' to print all sources in info table.")
+  parser.add_argument("--zp", required=True, help="Filename containing the zeropoints for each chip and filter.")
+  parser.add_argument("--dm", type=float, required=True, help="Distance modulus in magnitudes.")
+  parser.add_argument("--chip", type=int, choices=[1,2,3,4], required=True, help="Chip number.  Choose from 1 2 3 4.")
+  parser.add_argument("--verbose", action="store_true", default=False, help="If set, then will print lots of messages.")
   args = parser.parse_args()
   
-  info_table = get_info_table(args.info)
-  
-  raw_zp = get_zeropoints(args.zp)
+  # Read info table
+  info_table = get_info_table(args.info, verbose=args.verbose)
+  source_list = info_table["id"]
+
+  # Check to see if provided source is a filename
+  if os.path.isfile(args.source[0]):
+    print("List of sources provided.")
+
+  # Read in the zeropoints table and put into ZeroPoints class
+  raw_zp = get_zeropoints(args.zp, verbose=args.verbose)
   zps = ZeroPoints(raw_zp, args.dm)
 
-  src_ref_info = RefInfo(info_table, args.source)    
-  src_ref_info.lc_exist()
+  if args.source[0].lower() == "list":
+    for each in source_list: print(each)
+    exit()
 
-  extract_light_curves(src_ref_info, zps, chip=args.chip)
+  for source in args.source:
+    if args.verbose:
+      print("\n***Getting light curve for %s***" % source)
 
+    # Put reference data into object
+    src_ref_info = RefInfo(info_table, source)  
+   
+    # Check to see which bandpasses have data      
+    if args.verbose: src_ref_info.lc_exist()
+    
+    # Extract the light curve and write to a file
+    extract_light_curves(src_ref_info, zps, chip=args.chip, verbose=args.verbose)
 
 if __name__ == "__main__":
   main()

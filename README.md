@@ -10,8 +10,8 @@ lc_extract.py
 Usage: extract light curves from multi-epoch imaging using the LBC. It is assumed that all the data for each chip are contained in their own separate directory.  
 
 Installation:  
-Clone repository by executing: `git clone https://github.com/skylergrammer/LBT_LBC.git`
-
+1. Clone repository by executing: `git clone https://github.com/skylergrammer/LBT_LBC.git`  
+2. Add repository to PythonPath: `export PYTHONPATH=$PYTHONPATH:<i>path_to_LBT_LBC</i>`  
 
 Required input:  
 

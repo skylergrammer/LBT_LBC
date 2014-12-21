@@ -16,12 +16,12 @@ Required input:
 3. File containing the zeropoints for each chip and each band  
 
 Parameters:  
-1. --info: Filename of info table
-2. --source: Object(s) to extract. May be a file with a list. 
-3. --zp: Filename containing the zeropoints
-4. --dm: Distance modulus
-5. --chip: Choose from 1 2 3 4
-6. --verbose: If specified, will print some messages as it goes  
+1. --info: Filename of info table.  
+2. --source: Object(s) to extract. May be a file with a list.  
+3. --zp: Filename containing the zeropoints.  
+4. --dm: Distance modulus.  
+5. --chip: Choose from 1 2 3 4.  
+6. --verbose: If specified, will print some messages as it goes.  
 
 Output:  
 For each source, will output a file file for each bandpass.  Format is mjd (days), magnitude, and magnitude error.  

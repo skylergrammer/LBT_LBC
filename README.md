@@ -5,6 +5,11 @@ Contents
 1. lc_extract.py
 2. test_data
 
+Comments
+--------
+Script(s) are free to anyone to use but the data are intended for demonstrative purposes only.  
+Comments, questions, requests may be sent to <i>skylergrammer</i> @ gmail.com.  
+
 lc_extract.py
 -------------
 Usage: extract light curves from multi-epoch imaging using the LBC. It is assumed that all the data for each chip are contained in their own separate directory.  

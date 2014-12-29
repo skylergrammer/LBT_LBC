@@ -2,8 +2,9 @@ Large Binocular Telecope -- Large Binocular Camera
 ==================================================
 Contents
 --------
-1. lc_extract.py
-2. test_data
+1. lc_extract.py  
+2. test_data  
+3. LBC data for M101, N2403, and M81  
 
 Comments
 --------

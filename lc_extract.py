@@ -41,7 +41,7 @@ def get_info_table(filename, verbose=False):
                                missing_values=("0.0","000"), filling_values=np.nan)
   except Exception as e:
     if verbose: print(e)
-    sys.exit("***Error whiile reading %s.  Verify that the filename is correct." % filename) 
+    sys.exit("***Error whiile reading %s.  Verify filename or use --v to see error." % filename) 
 
   return info_table
 
@@ -312,17 +312,19 @@ def main():
 
     # Put reference data into object
     try:
-      src_ref_info = RefInfo(info_table, source)  
+      src_ref_info = RefInfo(info_table, source)
+      
+      # Check to see which bandpasses have data      
+      if args.verbose: src_ref_info.lc_exist() 
+ 
     except Exception as e:
       if args.verbose: print(e)
       continue
-
-    # Check to see which bandpasses have data      
-    if args.verbose: src_ref_info.lc_exist()
-    
+   
     # Extract the light curve and write to a file
     try:
       extract_light_curves(src_ref_info, zps, chip=args.chip, verbose=args.verbose)
+
     except Exception as e:
       if args.verbose: print(e)
       continue

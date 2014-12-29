@@ -1,0 +1,15 @@
+ZEROPOINTS--------
+R     7.78    0.02  
+V     8.18    0.02  
+B     7.60    0.01 
+U     5.99    0.02   
+------------------
+distance= 27.7670
+
+
+mag_band=mag_instrumental+offset-distmod
+
+N2403_chip2.txt, here's what the columns are:
+x_shifted,y_shifted,id,lc_name_Rband,xR,yR,magR,emagR,lc_name_Vband,xV,yV,magV,emagV,lc_name_Bband,xB,yB,magB,emagB,lc_name_Uband,xU,yU,magU,emagU
+
+Sources seemed to have matched well on this chip. 

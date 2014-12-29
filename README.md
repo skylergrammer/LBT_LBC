@@ -39,7 +39,7 @@ lc_<i>source</i>_<i>band</i>.txt
 
 Example:  
 `cd test_data`  
-`lc_extract.py --info M101_chip1.txt --chip 1 --dm 29.03 --zp zeropoints.txt --verbose --source V9`  
+`lc_extract.py --info M101_chip1.txt --chip 1 --dm 29.03 --zp zeropoints.txt --v --source V9`  
 Output Produced:  
 `***Getting light curve for V9***`  
 `U-Band lightcurve filename: Ulc00172.535.1624`  

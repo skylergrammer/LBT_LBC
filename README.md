@@ -30,7 +30,7 @@ Parameters:
 3. --zp: Filename containing the zeropoints.  
 4. --dm: Distance modulus.  
 5. --chip: Choose from 1 2 3 4.  
-6. --verbose: If specified, will print some messages as it goes.  
+6. --v: Verbose. If specified, will print some messages as it goes.  
 
 Output:  
 For each source, will output a file file for each bandpass.  Format is mjd (days), magnitude, and magnitude error.  

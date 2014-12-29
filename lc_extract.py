@@ -97,51 +97,63 @@ class RefInfo:
   bandpass, errors, and the filename for the light curve.
   '''
 
-  def __init__(self, data, id):
-    self.id = id
+  def __init__(self, data, source):
+    self.id = source
       
-    ref_info = [x for x in data if id in x]
+    ref_info = [x for x in data if source in x]
 
     if not ref_info:
-      sys.exit("***ERROR: %s does not exist within the info table.\n" % id)
-    else:
-      ref_info = ref_info[0]
-    
-    if os.path.isfile(ref_info["lcU"]):
-      self.lcU = ref_info["lcU"]
-      self.refU = ref_info["magU"]
-      self.erefU = ref_info["emagU"]
-    else:
+      print("***ERROR: %s does not exist within the info table." % source) 
       self.lcU = False
       self.refU = False
       self.erefU = False
-
-    if os.path.isfile(ref_info["lcB"]):
-      self.lcB = ref_info["lcB"]
-      self.refB = ref_info["magB"]
-      self.erefB = ref_info["emagB"]
-    else:
       self.lcB = False
       self.refB = False
       self.erefB = False
-
-    if os.path.isfile(ref_info["lcV"]):
-      self.lcV = ref_info["lcV"]
-      self.refV = ref_info["magV"]
-      self.erefV = ref_info["emagV"]
-    else:
       self.lcV = False
       self.refV = False
       self.erefV = False
-
-    if os.path.isfile(ref_info["lcR"]):
-      self.lcR = ref_info["lcR"]
-      self.refR = ref_info["magR"]
-      self.erefR = ref_info["emagR"]
-    else:
       self.lcR = False
       self.refR = False
       self.erefR = False
+    else:
+      ref_info = ref_info[0]
+    
+      if os.path.isfile(ref_info["lcU"]):
+        self.lcU = ref_info["lcU"]
+        self.refU = ref_info["magU"]
+        self.erefU = ref_info["emagU"]
+      else:
+        self.lcU = False
+        self.refU = False
+        self.erefU = False
+
+      if os.path.isfile(ref_info["lcB"]):
+        self.lcB = ref_info["lcB"]
+        self.refB = ref_info["magB"]
+        self.erefB = ref_info["emagB"]
+      else:
+        self.lcB = False
+        self.refB = False
+        self.erefB = False
+
+      if os.path.isfile(ref_info["lcV"]):
+        self.lcV = ref_info["lcV"]
+        self.refV = ref_info["magV"]
+        self.erefV = ref_info["emagV"]
+      else:
+        self.lcV = False
+        self.refV = False
+        self.erefV = False
+
+      if os.path.isfile(ref_info["lcR"]):
+        self.lcR = ref_info["lcR"]
+        self.refR = ref_info["magR"]
+        self.erefR = ref_info["emagR"]
+      else:
+        self.lcR = False
+        self.refR = False
+        self.erefR = False
 
   def lc_exist(self):
     '''
@@ -270,9 +282,9 @@ def main():
   parser.add_argument("--info", required=True, help="Filename containing reference magnitudes, coordinates, ids, and filenames for the light curves.")
   parser.add_argument("--source", nargs="+", help="Source(s) to extract or filename containing list of sources.  Give the string 'list' to print all sources in info table.")
   parser.add_argument("--zp", required=True, help="Filename containing the zeropoints for each chip and filter.")
-  parser.add_argument("--dm", type=float, required=True, help="Distance modulus in magnitudes.")
-  parser.add_argument("--chip", type=int, choices=[1,2,3,4], required=True, help="Chip number.  Choose from 1 2 3 4.")
-  parser.add_argument("--verbose", action="store_true", default=False, help="If set, then will print lots of messages.")
+  parser.add_argument("--dm", type=float, default=0, help="Distance modulus in magnitudes.  If not specified, default is 0.")
+  parser.add_argument("--chip", type=int, choices=[1,2,3,4], default=2, help="Chip number.  Choose from 1 2 3 4.  If not specifed, default is chip 2.")
+  parser.add_argument("--v", dest="verbose", action="store_true", default=False, help="If set, then will print lots of messages.")
   args = parser.parse_args()
   
   # Read info table
@@ -282,7 +294,7 @@ def main():
   # Check to see if provided source is a filename
   if os.path.isfile(args.source[0]):
     print("List of sources provided.")
-    source_list = [x.strip("\n") for x in open(args.source[0], "r")]  
+    source_list = [x.strip("\n").strip("\r") for x in open(args.source[0], "r")]  
   else: 
     source_list = args.source
 
@@ -299,13 +311,22 @@ def main():
       print("\n***Getting light curve for %s***" % source)
 
     # Put reference data into object
-    src_ref_info = RefInfo(info_table, source)  
-   
+    try:
+      src_ref_info = RefInfo(info_table, source)  
+    except Exception as e:
+      if args.verbose: print(e)
+      continue
+
     # Check to see which bandpasses have data      
     if args.verbose: src_ref_info.lc_exist()
     
     # Extract the light curve and write to a file
-    extract_light_curves(src_ref_info, zps, chip=args.chip, verbose=args.verbose)
+    try:
+      extract_light_curves(src_ref_info, zps, chip=args.chip, verbose=args.verbose)
+    except Exception as e:
+      if args.verbose: print(e)
+      continue
+
 
 if __name__ == "__main__":
   main()

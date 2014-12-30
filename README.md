@@ -33,8 +33,10 @@ Parameters:
 5. --c chip_number: Choose from 1 2 3 4.  
 6. --v: If specified, code operates in verbose mode.  
 
-Calculations:
-Each epoch is subtracted from the reference image to get differential light curves for each pixel. After subtraction, sources are then photometered to give the difference in counts with respect to the reference.  Thus the light curve files are give MJD, delta_counts, and an error. The reference images are photometered using <i>DAOPHOT</i> and magnitdues given by mag_ref = mag_instrumental + offset + distance_modulus. The offset is given by offset = zeropoint + 25.0.  
+Calculations:  
+Each epoch is subtracted from the reference image to get differential light curves for each pixel. After subtraction, sources are then photometered to give the difference in counts with respect to the reference.  Thus the light curve files are give MJD, delta_counts, and an error. The reference images are photometered using <i>DAOPHOT</i> and magnitdues given by:  
+mag_ref = mag_instrumental + offset + distance_modulus  
+where offset = zeropoint + 25.0.  
 
 To get an apparent magnitude for each epoch, it is necessary to convert the reference magnitude to counts:  
 ref_counts = 10**(-0.4*(ref_mag-offset + distance_modulus))  

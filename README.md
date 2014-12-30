@@ -15,17 +15,17 @@ lc_extract.py
 -------------
 Usage: extract light curves from multi-epoch imaging using the LBC. It is assumed that all the data for each chip are contained in their own separate directory.  
 
-Installation:  
+<b>Installation:</b>  
 1. Clone LBT_LBC repository by executing in home directory (or wherever you want): `git clone https://github.com/skylergrammer/LBT_LBC.git`  
 2. Add repository to $PATH in bash: `export PATH=$PATH:insert_path_to_respository`
 3. Make lc_extract.py executable: `chmod u+x lc_extract.py`
 
-Required input:  
+<b>Required input:</b>  
 1. Info table file containing the reference data
 2. Raw light curve output from ISIS  
 3. File containing the zeropoints for each chip and each band  
 
-Parameters:  
+<b>Parameters:</b>  
 1. --i info: Filename of info table.  
 2. --s source: Object(s) to extract. May be a file with a list.  
 3. --zp zeropoints: Filename containing the zeropoints.  
@@ -33,7 +33,7 @@ Parameters:
 5. --c chip_number: Choose from 1 2 3 4.  
 6. --v: If specified, code operates in verbose mode.  
 
-Calculations:  
+<b>Calculations:</b>  
 Each epoch is subtracted from the reference image to get differential light curves for each pixel. After subtraction, sources are then photometered to give the difference in counts with respect to the reference.  Thus the light curve files are give `MJD`, `delta_counts`, and an error. The reference images are photometered using <i>DAOPHOT</i> and magnitdues given by:  
 `mag_ref = mag_instrumental + offset + distance_modulus`  
 where `offset = zeropoint + 25.0`  
@@ -47,11 +47,11 @@ Then, `delta_counts` are converted to total counts for a given epoch by subtract
 Finally, apparent magnitudes are calculated for each epoch by the following formula:  
 `mag = -2.5*np.log10(counts) + offset`  
 
-Output:  
+<b>Output:</b>  
 For each source, will output a file file for each bandpass.  Format is mjd (days), magnitude, and magnitude error.  
 lc_<i>source</i>_<i>band</i>.txt
 
-Example:  
+<b>Example:</b>  
 `cd test_data`  
 `lc_extract.py --i M101_chip1.txt --c 1 --dm 29.03 --zp zeropoints.txt --v --s V9`  
 Output Produced:  

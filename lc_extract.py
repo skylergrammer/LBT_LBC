@@ -9,6 +9,10 @@ try:
   import numpy as np
 except:
   missing_mods.append("numpy")
+try:
+  import matplotlib.pyplot as plt
+except:
+  missing_mods("matplotlib")
 
 if missing_mods:
   sys.exit("\n***ERROR! You must have the following modules installed: %s\n" 
@@ -41,7 +45,7 @@ def get_info_table(filename, verbose=False):
                                missing_values=("0.0","000"), filling_values=np.nan)
   except Exception as e:
     if verbose: print(e)
-    sys.exit("***Error whiile reading %s.  Verify filename or use --v to see error." % filename) 
+    sys.exit("***Error whiile reading %s. Verify filename or use --v to see error." % filename) 
 
   return info_table
 
@@ -262,8 +266,8 @@ def extract_light_curves(src_ref_info, zps, chip=None, verbose=False):
     light_curve_R = convert_to_lc(lcR_data, src_ref_info, zps, band="R", chip=chip)
     write_to_file(light_curve_R, src_ref_info.id, band="R", verbose=verbose)
 
-def write_to_file(light_curve, sourceid, band, verbose=False):
 
+def write_to_file(light_curve, sourceid, band, verbose=False):
 
   filename = "_".join(["lc",sourceid, band+".txt"])
 
@@ -279,11 +283,11 @@ def write_to_file(light_curve, sourceid, band, verbose=False):
 def main():
   
   parser = argparse.ArgumentParser()
-  parser.add_argument("--info", required=True, help="Filename containing reference magnitudes, coordinates, ids, and filenames for the light curves.")
-  parser.add_argument("--source", nargs="+", help="Source(s) to extract or filename containing list of sources.  Give the string 'list' to print all sources in info table.")
+  parser.add_argument("--i", dest="info", required=True, help="Filename containing reference magnitudes, coordinates, ids, and filenames for the light curves.")
+  parser.add_argument("--s", dest="source", nargs="+", help="Source(s) to extract or filename containing list of sources.  Give the string 'list' to print all sources in info table.")
   parser.add_argument("--zp", required=True, help="Filename containing the zeropoints for each chip and filter.")
   parser.add_argument("--dm", type=float, default=0, help="Distance modulus in magnitudes.  If not specified, default is 0.")
-  parser.add_argument("--chip", type=int, choices=[1,2,3,4], default=2, help="Chip number.  Choose from 1 2 3 4.  If not specifed, default is chip 2.")
+  parser.add_argument("--c", dest="chip", type=int, choices=[1,2,3,4], default=2, help="Chip number.  Choose from 1 2 3 4.  If not specifed, default is chip 2.")
   parser.add_argument("--v", dest="verbose", action="store_true", default=False, help="If set, then will print lots of messages.")
   args = parser.parse_args()
   
@@ -324,7 +328,7 @@ def main():
     # Extract the light curve and write to a file
     try:
       extract_light_curves(src_ref_info, zps, chip=args.chip, verbose=args.verbose)
-
+      plt.show()
     except Exception as e:
       if args.verbose: print(e)
       continue

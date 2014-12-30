@@ -26,12 +26,12 @@ Required input:
 3. File containing the zeropoints for each chip and each band  
 
 Parameters:  
-1. --info: Filename of info table.  
-2. --source: Object(s) to extract. May be a file with a list.  
-3. --zp: Filename containing the zeropoints.  
-4. --dm: Distance modulus.  
-5. --chip: Choose from 1 2 3 4.  
-6. --v: Verbose. If specified, will print some messages as it goes.  
+1. --i info: Filename of info table.  
+2. --s source: Object(s) to extract. May be a file with a list.  
+3. --zp zeropoints: Filename containing the zeropoints.  
+4. --dm distance_modulus: Distance modulus.  
+5. --c chip_number: Choose from 1 2 3 4.  
+6. --v: If specified, code operates in verbose mode.  
 
 Output:  
 For each source, will output a file file for each bandpass.  Format is mjd (days), magnitude, and magnitude error.  
@@ -39,7 +39,7 @@ lc_<i>source</i>_<i>band</i>.txt
 
 Example:  
 `cd test_data`  
-`lc_extract.py --info M101_chip1.txt --chip 1 --dm 29.03 --zp zeropoints.txt --v --source V9`  
+`lc_extract.py --i M101_chip1.txt --c 1 --dm 29.03 --zp zeropoints.txt --v --s V9`  
 Output Produced:  
 `***Getting light curve for V9***`  
 `U-Band lightcurve filename: Ulc00172.535.1624`  

@@ -34,18 +34,18 @@ Parameters:
 6. --v: If specified, code operates in verbose mode.  
 
 Calculations:  
-Each epoch is subtracted from the reference image to get differential light curves for each pixel. After subtraction, sources are then photometered to give the difference in counts with respect to the reference.  Thus the light curve files are give MJD, delta_counts, and an error. The reference images are photometered using <i>DAOPHOT</i> and magnitdues given by:  
-mag_ref = mag_instrumental + offset + distance_modulus  
-where offset = zeropoint + 25.0.  
+Each epoch is subtracted from the reference image to get differential light curves for each pixel. After subtraction, sources are then photometered to give the difference in counts with respect to the reference.  Thus the light curve files are give `MJD`, `delta_counts`, and an error. The reference images are photometered using <i>DAOPHOT</i> and magnitdues given by:  
+`mag_ref = mag_instrumental + offset + distance_modulus`  
+where `offset = zeropoint + 25.0`  
 
 To get an apparent magnitude for each epoch, it is necessary to convert the reference magnitude to counts:  
-ref_counts = 10**(-0.4*(ref_mag-offset + distance_modulus))  
+`ref_counts = 10**(-0.4*(ref_mag-offset + distance_modulus))`  
 
-Then, delta_counts are converted to total counts for a given epoch by subtracting the delta_counts from the reference counts:  
-counts = ref_counts - delta_counts  
+Then, `delta_counts` are converted to total counts for a given epoch by subtracting `delta_counts` from `ref_counts`:  
+`counts = ref_counts - delta_counts`  
 
 Finally, apparent magnitudes are calculated for each epoch by the following formula:  
-mag = -2.5*np.log10(counts) + offset  
+`mag = -2.5*np.log10(counts) + offset`  
 
 Output:  
 For each source, will output a file file for each bandpass.  Format is mjd (days), magnitude, and magnitude error.  

@@ -88,9 +88,9 @@ def get_lc_data(filename, verbose=False):
   in the info table.
   '''
 
-  header = ['mjd', 'dCounts', 'edCounts']
+  header = ['mjd', 'dCounts1', 'edCounts1', 'dCounts', 'edCounts']
   if verbose: print("Reading light curve file %s" % filename)
-  lc_data = np.genfromtxt(filename, usecols=[0,1,2], names=header)
+  lc_data = np.genfromtxt(filename, usecols=[0,1,2,3,4], names=header)
 
   return lc_data
 
@@ -217,16 +217,16 @@ def convert_to_lc(lc, src_ref_info, zps, band=None, chip=1):
     zp = zps.R[chip]
     ezp = zps.eR[chip] 
 
+
   # Default offset is the zeropoint plus the IRAF 25.0
   offset = zp + 25.0
 
   # Convert ref_mag to counts
-  ref_counts = 10**((ref_mag-offset + zps.dm)/-2.5)
+  ref_counts = 10**(-0.4*(ref_mag-offset + zps.dm))
   
   # Convert delta counts to a magnitude
-  counts_i = [ref_counts - x if x < ref_counts else np.nan 
-              for x in lc['dCounts']]
-  mag_i = np.array([-2.5*np.log10(x)+offset for x in counts_i])
+  counts_i = ref_counts - np.array(lc["dCounts"])
+  mag_i = -2.5*np.log10(counts_i) + offset
   
   # Factor to be used in error propagation
   Beta = (2.5*e_ref_mag)**2
